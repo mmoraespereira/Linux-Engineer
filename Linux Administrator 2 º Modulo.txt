@@ -1,0 +1,67 @@
+
+2º Modulo de implementação de serviços 
+
+Serviço DNS
+Servicos de centralização de informações openldap 
+Servidor de Email
+
+Maquina gatewal - firewall, dhcp, proxy, vpn 
+
+intranet - (dns master, apache 2)
+
+
+DNS 
+
+Principal objetivo e fazer a resolução de nomes
+53/udp - consulta
+cache - tem alguma resposta referente a requisição 
+root-servers - São servidores dispoiveis de dns
+ttl - determina por quanto tempo essa consulta vai ficar guardada detro do cache 20m 
+o servidor dns determina 
+Consulta recursiva - root-servers
+
+-------------------------------------------------------------------------------------
+
+instalação do bind9
+
+apt install bind9 bind9utils dnsutils -y
+
+isola o serviço dns - a camada de serviço evita alguns ataques de exploração, ganhar privilegios de escala isolar ele dentro de um diretorio especifico.
+
+criar o diretorio - mkdir -pv /var/bind9/chroot
+vim /etc/default/named - aponta para o serviço do dns para pegar as informações no diretorio 
+
+dentro do arquivo alterar - -t /var/bind9/chroot
+
+quando acontecer o problema de arquivo alterado - rm /etc/default/.named.swp
+
+criando outros diretorios - mkdir -pv /var/bind9/chroot/{etc,dev,var/cache/bind,var/run/named}
+
+-p - parents diretorio pai e filho 
+
+shift + control + v para colar 
+
+ls -l /etc/bind/*
+
+named.conf - arquivo de configuração
+
+Movendo o diretório bind para o chroot - mv /etc/bind /var/bind9/chroot/etc/
+
+ln -s /var/bind9/chroot/etc/bind /etc/bind - criando um link para facilitar o acesso
+
+cd /var/bind9/chroot/dev - 
+
+criar dois dispositivos - null e random 
+mknod - criar um dispositivo que vao ser utilizados pelo dns 
+mknod null c 1 3 
+mknod random c 1 8 
+
+
+
+
+alterar a data - date 030810322023
+timedatectl - 
+ls -l /etc/localtime 
+
+
+

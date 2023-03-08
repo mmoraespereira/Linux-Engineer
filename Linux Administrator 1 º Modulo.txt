@@ -1,0 +1,1744 @@
+/etc/ - arquivos de configurações
+
+
+l - atalho 
+
+cd - Volta para o diretório alterior 
+
+rm -v remove detalhadamente
+
+touch doc0{1..5}.txt
+
+-------------------------------------------------------------------------------------
+man pwconv
+
+
+cp -rp permissão 
+
+who ou w - informa quais são os usuário estão logados.
+
+control + r - Busca os comando executados.
+
+!numero da linha.
+
+history fc -l- Lista os comandos digitado.
+
+echo $HISTSIZE - lista os comandos que digitamos.
+/root/.bash history
+
+analista@debian:~$ history -c 
+analista@debian:~$ history -w
+
+ls não esta dentro dos comandos internos do bash 
+
+info - instala para obter informações sobre os comandos 
+
+Ajuda interna o man
+
+
+-r, --to-rpm              Generate a Red Hat rpm package. - converter para rpm.
+
+-----------------------------------------------------------------------------------------------------
+
+man -k ou apropos network mostra todos os manuais que tem a palavra 
+
+1 coluna nome do manual - 2 descricao - 3 sessao do manual 
+
+man 5 systemd.network
+
+
+whatis - busca o nome 
+main -k / f ou apropos - busca também a descricao 
+
+mandb - atualiza os manuais
+/usr/local/man - 
+
+whereis ls - mostra onde ele esta. podendo tambem dizer se tem codigo fonte
+
+which - mostra somento o binario onde esta o programa.
+
+/usr/share/doc/nano "onde fica os comandos doc" - documentação dos camandos
+Bibliotecas / manuais /programas. 
+
+Slide 3
+
+ls -l /dev/std*
+
+date > date.txt - armazena em outra saida 
+
+cat / more / less / tac
+
+date | tee arqui01 , arqui02
+
+
+ls /etc/*.conf mostra os arquivos que terminam com a palavra 
+
+sort - ordena nl- numera
+ls /etc/*.conf |sort |nl
+
+ls /etc/*.conf |sort |nl |head -n 5   - mostra somente as cinco primeiras linhas
+
+date | tee arqui01.txt arqui02.txt
+
+date >> data.txt - fas o apende, incrementa os dados.
+
+find - comando que vc usa para localizar 
+
+find / -size +30M mostra os arquivos que são maiores que 30 mega
+
+find / -size +30M > saida.txt - pega a saida padrão 
+
+find / -size +30M 1> saida.txt 2>erros.txt saida dos erros no arquivo
+
+/dev/null dispositivo, ele elimina 
+
+find / -size +30M 1> saida.txt 2>&1 coloca tambem no mesmo arquivo os erros
+
+find / -size +30M 2> /dev/null |xargs ls -lh 
+
+xargs ls -lh - da um ls -lh mostrando detalhes de cada arquivos.
+
+----------------------------------------------------------------------------------------------
+
+13-01-2023
+
+< joga o comando para uma funcão
+set -o noclobber - proibe que os arquivos a partir desse momento sejam sobreesncritos.
+/etc/profile - altera esse documento na ultima linha e adiona o comando.
+
+ping 8.8.8.8 |cut -d " " -f 4 - cut seleciona as colunas
+
+cat -n /tmp/passwd  numera as linhas
+
+wc -l passwd - fas uma conta das linhas  
+
+wc -w passwd conta as palavras 
+
+wc -c passwd - conta as quantidades de caracter
+
+head -n 5 /tmp/passwd | tr : , onde tem dois pontos coloca a virgula
+
+head -n 5 /tmp/passwd | tr a-z A-Z converte tudo minusculo para maiusculo.
+                           a-t AT    
+head -n 5 /tmp/passwd  |tr -d o deleta a palavra
+
+sed
+
+head -n 5 /tmp/passwd  |tr a-z A-Z  > /tmp/resultado.txt - pega o resultado e coloca em um arquivo. 
+
+grep - filtragem 
+
+grep --color -n root /tmp/passwd desta com cor o resultado.
+
+grep - r busca em um diretório
+
+grep --color -n -r pam time /etc/ - busca por diretorio
+
+grep -i - vai pela palavra ignora maiusculo ou minusculo´
+
+grep -v - todas as linhas que não a palavra buscada.
+
+--------------------------------------------------------------------------------------------------------------------
+
+egrep --color -r [dD]ebian /tmp/passwd - busca por caracter expressão regular
+
+egrep --color -r '[dD]ebian$' /tmp/passwd - Mostra as palavras debian no final, o $ mostre as palavras no final.
+
+egrep - Podemos utilizar com expressões regulares.
+
+^ inicio de linha
+egrep --color -r '^deb-' /etc/ - tudo que começa com a palavra deb.
+
+começa com deb e tudo que termina com a palavra main
+
+egrep --color -r '^deb.*main$' /etc/
+
+egrep --color -r '^deb.*main$' /etc/
+
+egrep --color '^....:' /tmp/passwd - os pontos significam caracteres,ou seja tudo que tem quatro caracteres e apos :
+
+https://regexr.com/ ^
+$
+.
+.*
+[]
+
+head - busca os primeiros caracateres 
+
+fgrep - anula expressão regular
+
+fgrep --color '$y$' /etc/shadow 
+
+-F, --fixed-strings
+              Interpreta PADRÕES como textos fixos, não como expressões regulares.
+
+ls /etc/adduser.* - comeca com adduser e termina com qualquer palavra 
+
+ls /etc/a*.conf - no meio 
+
+ls /etc/*.???
+
+ls -d /etc/????.* - tudo que começa com quatro caracateres e termina apos o ponto
+qualquer coisa.
+
+ls -d /etc/????.? - a partir do ponto so um caracter.
+
+ls /etc/*.{cfg,conf} - tudo que comece com alguma coisa e termine com cfg ou conf
+
+ls /etc/*.{???,????}
+
+mkdir -pv - cria diretorio pai e filho 
+
+mkdir -pv /tmp/dados/{dir01,dir02,dir03} - Cria diretorios atraves de listas.
+
+ls  -l /etc/[a-d]*.conf
+
+ls  -l /etc/[!a-d]*.conf - negação tras tudo que começa porem não com a letra a ate d 
+
+
+mkdir -v d{1..5}
+rmdir -v d{1..5}
+
+---------------------------------------------------------------------------------------
+
+Comandos avancados.
+
+dd - Usado para conversão e copias, cloanagem, nivel de dispositivo.
+cp - amplitude de arquivos somente.
+
+dd if=/var/log/messages  of=/tmp/logs
+   origem - input file    destino - outoput file 
+
+lsblk - Mostra as partições 
+
+sda - primeiro HD
+sdb - secundario HD
+
+dd if=/dev/sda  of=/dev/sdb - Clonagem de um disco para o outro.
+
+dd if=/dev/sda1 of=/tmp/arquivo.img 
+
+dd if=/dev/zero of=/var/swapfile bs=1M count=500
+
+RAM
+SWAP
+
+lsblk - mostra as partições
+mkswap /var/swapfile - arquivo da swap criando
+
+dd if=/dev/zero of=/var/swapfile bs=1M count=500 - cria o arquivo
+mkswap /var/swapfile - torna o como swap 
+chmod 600 /var/swapfile - da a permissão
+swapon /var/swapfile - autoriza a swap a subir 
+swapoff /var/swapfile desfaz 
+
+dd if=/dev/zero of=/tmp/arquivo.img count=10 bs=1M - cria um arquivo de 10mg 
+
+split -b 4M -d /tmp/arquivo.img /opt/arq - quebra os arquivos 
+-d fala qual e o arquivo 
+
+ls -lh /opt/arq??
+
+cat arq00 arq01 arq02 > novo.img - monta o arquivo 
+cat arq0* > novo2.img - cria o novo arquivo sequencialmente.
+split -l 10 -d /tmp/passwd   /opt/senha - cria a quebra com linhas 
+wc -l /opt/senha0* - mostra o tamanho da linha
+
+cat > lista01.txt - cria um arquivo podendo colocar dados dentro, apos pressiona control + d e finaliza o processo.
+
+tirar nomes repetidos - unique -d - mostra somente os repetidos 
+
+sort lista01.txt |uniq -dc - mostra quanto estão repetindo numerado.´
+
+paste nomes.txt sobrenome.txt - mostra nomes e sobrenomes um do lado do outro paste
+
+join nomes.txt sobrenome.txt - fas a juncao de nomes e sobrenomes
+
+-----------------------------------------------------------------------------------------
+
+cut - traz a busca somente da coluna de uma pesquisa
+
+-d -f - colunas
+
+1 - login
+2 - senha
+3 - uid
+4 - gid
+5 - comentários 6 - diretório home 7 - shell
+
+head /etc/passwd |cut -d : -f 1
+head /etc/passwd |cut -d : -f 1,7
+head /etc/passwd |cut -d : -f 1-4
+
+ls -l /etc/*.conf | cut -c 1-10,40-70 - pega por caracter
+
+-d - delimitador
+
+ls -l /etc/*.conf |cut -c 1-11,43-70
+
+awk
+
+head  /etc/passwd |awk -F : '{ print $1 }'
+
+-F indica qual vai ser o delimitador
+
+head  /etc/passwd |awk -F : '{ print $1,$7 }'
+
+head  /etc/passwd |awk -F : '{ print "Login: "$1,"\tDiretório: "$7 }'
+
+uid
+uid >= 100
+$3 >= 100
+$1 == root
+
+cat /etc/passwd |awk -F : '$3 >= 100 {print "Nome: "$1,"Uid: "$3}' - Usando condições com o awk 
+NR
+FS
+
+Find - busca arquivo 
+
+find -name  - busca pelo nome exato 
+find -iname - busca pelo nome 
+find / -iname 'passwd*' 2> /dev/null - tudo que começa com a palavra passwd
+
+find /etc/ -user analista
+find /home -user analista
+
+
+find /home -user analista -iname '*bash*'
+find /home -user analista -iname '*bash*' |xargs file - no final mostrando detalhes dos arquivos
+
+find /var/ -type l | xargs file - pesquisando por tipo de arquivo 
+
+stat /etc/passwd
+
+stat /etc/passwd mostra o estado do arquivo 
+
+Lista os arquivos que foram alterados em menos de 30 minutos
+
+-amin  = acessados
+-mmin = modificados
+-cmin = alterados
+ minutos
+
+mostrando em dias
+-atime = 
+-mtime = 
+-ctime =
+
+find /etc/ -amin -30
+
+find /etc/ -mtime -10 - quais são os arquivos que foram modificados a menos de  dias
+
+watch 'find /etc/ -mtime -10' watch a cada dois minutos
+
+find /-size +50M 2>/dev/null 
+
+
+locate 
+
+updatedb - atualiza a base de dados.
+
+updatedb && apos o comando
+
+-------------------------------------------------------------------------------------------
+
+Edidor de text
+
+Vim, nano, seed
+
+update-alternatives --config editor - escolher qual será o editor de text padrão.
+
+Modo comando- quando entra no vim 
+Modo linha comando 
+Modo insersão
+
+y - copia
+p - cola
+x - delete
+
+Comando --> Inserçãoi = insertI = Inserta = appendA = appendo = new line insertO = new line insert
+
+insert - inserir texto
+
+:w - salva o arquivo 
+:w! - forca para salvar
+:q - sai do arquivo 
+:q! - sai forçado.
+:wq - salva e sai 
+:x - salva e sai 
+
+copiar
+selecionar
+colar
+recortar
+1 - seleção
+2 - copiar/recortar
+3 - colar
+
+v = visual characterV = visual line
+You  to  Daniel (Direct Message) 20:11
+Linux Force Security  to  Everyone 20:12
+
+v - copia uma linha
+V - seleciona varias linhas
+y = copia
+dd = corta
+p = colar
+Y - copia uma linha 
+
+numero de linha mais o Y ou yy - copia de acordo com o numero especificado 
+
+numero de linhas mais o dd - ele recorta as linhas conforme o numero especificado
+
+gg vai para a primeira linha 
+
+:numero - vai para a linha correspondente 
+
+G - vai para a ultima linha 
+
+/  = localizar de cima para baixo - apertando n ela vai selecionado a palavra
+? = localiza de baixo para cima
+
+:set ignorecase
+:set ic              - desabilita o case sensitive ela e temporaria 
+
+: x /tmp/doc02.txt - salva como o arquivo 
+
+control g - mostra o nome do arquivo 
+
+:! ls /tmp - vc visualiza os arquivos salvos
+:r! date - pega o resultado do comando e joga no texto
+
+:vsplit /etc/hosts - cria duas janelas
+
+control ww - alterna entre as telas 
+
+:qa! - sai dos arquivos
+
+u - desfazer 
+contro + r - refazer
+
+--------------------------------------------------------------------------------------
+
+nano 
+
+M- alt 
+^ - control
+
+sed -e 's/noLogin/login/g' /tmp/passwd - so imprime na tela, comando utilizado para subsituir uma palavra pela outra.
+
+sed -e '1,10s/nologin/login/g' /tmp/passwd - substitui por linhas 
+
+sed -i '10s/nologin/login/g' /tmp/passwd - ele altera o arquivo na linha 10
+
+sed -i  '/nologin/d' /tmp/passwd - exclui todos as linha que tem a palavra.
+
+blkid
+
+g - global substitui todas
+
+blkid |sed -e 's|"||g' - tira a aspa e coloca espaco em branco.
+
+blkid |sed -e 's|BLOCK_SIZE|teste|g' 
+
+
+Dispositivos
+
+
+script saida.txt - todos os comandos que digitarmos vai gravar no saida.txt 
+
+Depois usa o comando more saida.txt
+
+script -a saida.txt - continua gravando no mesmo arquivo 
+
+echo "$(whoami)-$(date +%H:%M)" - conbinação 
+
+HD 
+
+  fdisk -l - mostra os discos e partições
+
+sda 1 ao 4 - são particões primarias
+5 ao 16 são logicas
+
+para que vc possa realizar varias partições atraves de uma partição estendia ele coloca as logicas dentro das estendidas 
+
+lsblk - 
+
+lsblk /dev/sda - tras mais informações
+
+MOUNTPOINT - mostra onde ele esta montado
+
+df -h - Quanto e que esta consumindo
+
+lsblk -f - Mostra tambem o que esta comsumindo
+
+cat /proc/partitions - esse tem a listagem das partições
+
+----------------------------------------------------------------------------------
+
+blkid - trazer as informações sobre id dos dispositivos
+
+UUID -numero unico que esta acionado ao dispositivo ex: sd1.
+
+lsblk -f - tambem traser o UUID - numero de indentificar universal.
+
+du - estima o espaco em uso 
+
+du -sh /boot/ - quanto de espaço o diretorio esta ocupando no momento.
+
+du -sh /etc/ /home/
+
+du -sh * 2>dev/null - pega todos os diretorios. tamanho
+
+du -sh *  2> /dev/null  |sort -h - ordena tambem por tamanho
+
+lscpu - tras informações sobre a cpu
+
+cat /proc/cpuinfo - arquivo que contem informações sobre a cpu 
+
+cat /proc/meminfo - arquivo que contem informações sobre a memmoria
+
+free -h - quantidade de memoria 
+
+echo 3 > /proc/sys/vm/drop_caches - limpeza do cache da memoria
+
+top - mostra o uso de memoria e atualiza 
+tempo ocioso quanto a cpu não esta sendo usada
+
+M - ordena por memoria 
+P - ordena por cpu
+Q- sai do top 
+
+htop - tambem tras informações - tem que instalar 
+
+swapon -s - pode ser estruturado em aquivo, 
+cat /proc/swaps 
+
+lsusb - quais são as entradas isb e o que esta vinculado nela
+lsusb -v - tras mais onformações.
+
+lspci - lista os dispositivos pci
+
+lspci -k - tras mais detalhes os modulos.
+
+lspci -v - tras uma serie de outros intens, latencia
+
+modulo - são os driver no linux
+
+lshw - captura de informações, fazer inventario da manquina e individual
+
+lshw -html > /tmp/result.html - joga em um arquivo 
+lshw -short - mostra as classes
+lshw -class cpu,network - lista harda
+
+shutdown -h now - desliga a maquina
+
+------------------------------------------------------------------------------------------
+
+hostnamectl set-hostname intranet.asf.com
+
+usando o HD
+
+sistema de arquivo: ext4, xfs 
+
+1 - Particionar 
+2 - Formatar (Sistema de Arquivos) 
+3 - Montagem
+
+/dev/sdb
+
+2 partições de 5G primarias
+
+Criar particão: fdisk /dev/sdb
+
+n adiciona uma nova partição
+
+p mostraa tabela de partição
+
+t alterao tipo da partição
+
+v Verifica a tabela de partição
+
+i mostra informação sobre uma partição
+
+F - mostra se tem espaço disponivel 
+
+w - grava e sai 
+
+
+ext4 - suporte 4 bilhoes de arquivos - arquivos menores 
+
+O XFS foi criado pela Silicon Graphics. Usavam para trabalhar com video. Ele é mais otimizado para arquivos grandes. 
+
+apt update -y - atualiza os pacotes 
+
+apt install vim xfsprogs parted
+
+para formatar usar - mkfs -t xfs 
+
+mkfs -t xfs -f /dev/sdb1
+mkfs -t xfs -f /dev/sdb2
+mkfs -t xfs -f /dev/sdc1
+
+Criar rotulos para as partições
+
+xfs_admin -L express /dev/sdb1
+
+Montagem 
+
+fixa
+temporaria
+
+mount /dev/sdb1 /srv/www/express - isso e temporario 
+
+fixo - altera o arquivo /etc/fstab
+
+mount -a - verifica se partições montadas estão corretas  
+
+-------------------------------------------------------------------------
+
+
+default - tem a permissão de leitura e escrita 
+
+rw
+noexec - coloca no final para não executar 
+dump - 
+
+se tiver 0 - não realizar backup com o dump, não faz a checagem na inicialização.
+
+0 - não dump
+1 - backup dump
+fsck
+
+
+0 - no fsck  checagem de disco
+1 - fsck
+
+mount -a - monta tudo 
+
+tune2fs
+
+mkfs -t ext4 /dev/sdb1
+mkfs -t ext3 /dev/sdb2
+
+tune2fs -L git /dev/sdb1
+tune2fs -L backups /dev/sdb2
+
+LABEL=git  - da para montar com a label.
+
+man cpio - comando uzado para copia de arquivos
+
+cpio  {-o|--create} [> archive]
+cpio {-i|--extract}
+< archive
+
+find /home/analista/git |cpio -ov > /backups/conf.cpio
+
+rm -rf /home/analista/git/*
+
+tar -cf arquivo.tar --verbose /etc
+tar -cvf /backups/conf.tar /home/analista/git /var/log
+
+cpio -iv </backups/conf.cpio
+
+---------------------------------------------------------------------------------------
+gzip
+bzip2
+xz
+
+gunzip conf.tar.gz - tira a compactação
+
+gzip conf.tar - compactar 
+
+xz conf.tar
+xz  -> 58M --> 3,8M - mais lento mais compacta mais
+
+unxz conf.tar.xz
+
+-j, --bzip2               Filter the archive through bzip2(1).
+
+
+-J, --xz               Filter the archive through xz(1).
+-z, --gzip, --gunzip, --ungzip               Filter the archive through gzip(1).
+
+tar -czvf /backups/conf.tar.gz /home/analista/git  /var/log/
+
+
+c
+z - de gzip 
+v
+f - file 
+
+gzip - mais rapido porem compacta menos 
+xz - demora mais porem compacta mais 
+
+gzip  -> 58M --> 6,8M
+
+
+tar -xzf /backups/cof
+
+x e extract 
+
+tar -xzf /backups/conf.tar.gz -C /tmp/ 
+
+tar -tzf /backups/conf.tar.gz - lista o conteudo que esta no arquivo 
+
+tar -tJf /backups/conf.tar.xz - extrair com xz
+
+Migrar a partição
+
+ext3 --> ext4
+lsblk -f /dev/sdb
+man sha1sum
+
+sha1sum conf.tar - verificar se sofreu alteração
+
+sha1sum * 2> /dev/null - fas para todos os arquivos
+
+umount /backups
+
+tune2fs -O extents,uninit_bg,dir_index /dev/sdb2 - mudar o sistema de arquivos
+
+
+Redes
+
+https://www.virtualbox.org/manual/ch06.html - placas de rede ´
+
+192.168.1.?
+cliente interno --> gateway --> internet
+
+
+
+intranet --> gateway --> internet
+
+gateway 1 - nat ( conexão com internet)
+2 - internal ( conexão com vms)
+3 - host only ( conexão vm cliente externo )
+
+1 - enp0s3 - nat 2 - enp0s8 - rede interna3 - enp0s9 - host only
+
+------------------------------------------------------------------------------
+
+Gateway 1 - nat (internet) 2 - rede interna ( comunicação vms) 3 - host only ( comunicação vms externa )
+IPv4 (192.168.1.10)
+decimal
+
+255.255.255.255
+0.0.0.0  -> 255.255.255.255
+
+rede publica -  
+rede privada - 
+
+3. Private Address Space     The Internet Assigned Numbers Authority (IANA) has reserved the    following three blocks of the IP address space for private internets:       10.0.0.0        -   10.255.255.255  (10/8 prefix)      172.16.0.0      -   172.31.255.255  (172.16/12 prefix)      192.168.0.0     -   192.168.255.255 (192.168/16 prefix)
+
+nat
+IPv6
+128 bits
+
+=2^8=256 hosts primeiro endereço rede ultimo endereço broadcast
+256-2 = 254
+/24 255.255.255.0
+
+/24 mostra a notação cidr
+
+/28
+
+
+=2^4 = 16
+14
+192.168.1.1
+192.168.1.14
+
+segmetação - criar vlan 
+
+gateway - 192.168.1.1
+storage - 192.168.1.30
+datacenter - 192.168.1.20
+intranet - 192.168.1.10
+
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+
+git clone https://github.com/rogerramossilva/linuxforce
+
+/etc/sysconfig/network-scrits - estão os arquivos de configuração de rede - centos 
+
+enp0s8 192.168.1.1 255.255.255.0
+enp0s9  200.50.100.10 200.50.100.20 255.255.255.0
+
+-----------------------------------------------------------------------------------------
+
+
+/etc/resolv.conf - Quais não os servidores dns que vão encaminhar
+
+chattr +i /etc/resolv.conf - torna imutavel 
+chattr -i /etc/resolv.conf - tira a configuração.
+
+lsattr /etc/resolv.conf - ver se tem a configuração. 
+
+vim /etc/sysctl.conf
+
+net.ipv4.ip_forward=1 - quero habilitar o encaminhamento de pacotes.
+
+para as maquinas que irão fazer o roteamento e importante adicionar esta linha.
+
+sysctl -p - carrega a atribuição do comando.
+
+nat - sempre que vc tem necessidade de trafegar os pacotes em redes diferentes.
+
+enp0s3 -> 10.0.2.15
+cliente interno  (192.168.1.100)  ->  nat 10.0.2.15
+intranet (192.168.1.10) -> nat  10.0.2.15
+Regra de Firewall
+MASQUERADE - pacote de uma rede e passa para a outra
+
+systemctl stop firewalld
+systemctl disable firewalld - desabilitando o firewal padrão 
+
+yum install iptables-services - instalando o iptables
+
+systemctl enable iptables - subindo o serviço 
+
+/root/linuxforce/gateway/sbin/firewall.sh /sbin - aqui que vão estar as regras de firewal.
+
+vim /etc/sbin/firewall.sh 
+firewall.sh - executa 
+
+hostnamectl set-hostname storage.asf.com
+
+/etc/network/interfaces - 
+auto enp0s3
+iface enp0s3 inet static 
+ address 192.168.1.30
+ netmask
+gateway
+
+systemctl restart networking - reinicia o serviço para fichar as configurações 
+
+
+-----------------------------------------------------------------------------------------
+
+hostnamectl set-hostaname datacenter.asf.com
+
+auto enp0s3
+iface enp0s3 inet dhcp - deixando como dhcp 
+
+dhcp discovery dispara para a rede para saber qual e o servidor dhcp porta 67/udp
+dhcp offer - oferta o ip
+dhcp resquest 
+dhcp ack 
+
+yum install dhcp-server -y
+
+cp /root/linuxforce/gateway/etc/dhcp/dhcpd.conf  /etc/dhcp/
+
+------------------------------------------------------------------------------------------
+
+ddns-update-style none - permite o dhcp tambem o dns junto
+registre o nome da maquina e o enderecamento ip.
+
+none - de forma individual
+escopo - subnet
+range - qual e o intervalo 192.168.1.111 a 192.168.1.222
+escopo de entrega.
+
+option router - apontamento para a maquina gateway.
+
+lease-time 600 mintutos - tempo de emprestimo 
+renovacão
+
+reservar de ip informando o mac
+
+systemctl restart dhcpd
+systemctl enable dhcpd - quando vc reinciar a maquina o serviço ja vai estar executando.
+
+08:00:27:f7:df:85
+
+systemctl status iptables
+systemctl is-enable iptables
+
+-----------------------------------------------------------------------------------------
+
+gerenciamento de pacotes 
+
+conecção com repositorio 
+
+gerenciamento de alto nivel - instalação, remoção, listagem 
+
+/etc/apt/sources.list - principal arquivo 
+
+deb-srv - com codigo fonte
+
+sources.list.d - cria repositorios especificos
+
+
+
+apt-update -y - atualiza os pacotes  - y para confirmar 
+
+apt list --upgradable - mostra os programas que podem ser atualizados
+
+apt upgrade - atualiza todos os pacotes dos programas 
+
+apt search tcpdump - busca o software 
+
+apt show dcpdump - mostra mais informações
+
+apt policy tcpdump - mostra se esta instalado
+
+apt list tcpdump - busca diretamente o software 
+
+dpkg -l tcpdump - mostra se esta instalado
+
+remove - desinstala porem não exlui os arquivos totalemente.
+
+--purge - remove tudo
+
+apt remove --purge 
+apt purge
+
+apt autoremove - limpa os pocotes que são desnecessarios 
+
+cd /var/cache/apt/archives - arqui fica os arquivos baixados 
+
+apt celan - limpa os arquivos    
+
+apt build-dep htop -y - baixa as dependecias do programa para ser compilado
+
+apt search htop
+
+ls -lh
+
+./configure
+Gera Makefile
+make  (Compilar)
+
+make install 
+
+https://htop.dev/downloads.html
+
+wget https://github.com/htop-dev/htop/releases/download/3.2.1/htop-3.2.1.tar.xz
+
+tar -xJvf htop-3.2.1.tar.xz
+
+x - extrair 
+J - arquivo xz
+v - verboso 
+f - file 
+
+./configure && make && make install 
+su -root
+
+-------------------------------------------------------------------
+
+compilação de pacotes 
+
+./configure
+make
+make install
+
+gerenciador de baixo nivel
+
+apt download iftop 
+
+dpkg -l nome do programa - para ver se esta intalado 
+
+dpkg -I iftop_1.0~pre4-7_amd64.deb - tras informações do pacote, nome, versão, arquitetura
+ 
+dpkg -c - quais são os arquivos que estão dentro dele.
+
+dpkg -i iftop_1.0~pre4-7_amd64.deb - instalar o programa 
+
+dpkg -s iftop - tras informações pos instalação.
+dpkg -L iftop - tras a listagem 
+
+dpkg -S /usr/sbin/iftop - mostra o binario 
+dpkg -S /bin/pwd
+
+-P purge
+-r remove
+dpkg -r iftop - remove o programa 
+
+dpkg -L iftop =  dpkg -c (antes)
+
+apt install alien 
+
+cd /etc/yum.repos.d/ - repositorio no cent os 
+
+arquivos .repo - apresenta os respositorios 
+
+ym repolist - apresenta os repositorios 
+
+dggcheck - analisa o pacote
+
+yum makecache - analisa se tem algum pacote novo a ser instalado.
+
+yum check-update - pacotes que precizam ser atualizados
+
+yum list iftop - lista se tem o aplicativo para baixar 
+
+rpm -q iftop - verifica se esta instalado
+yum info iftop - mostra informações sobre o programa instalado
+
+yum groupinstall 'Guest Agents' - instalação 
+
+yum clean all - fas a limpeza 
+
+yum upgrade 
+
+yum search - pesquisa 
+
+yum remove iftop 
+
+yum download iftop
+
+yum grouplist
+yum groupinfo server - instala tudo o que tem no grupo 
+
+rpm -q iftop - verifica se esta instalado
+
+rpm -qpi iftop-1.0-0.26.pre4.el9.x86_64.rpm - analiza o pacote
+
+rpm -qpl iftop-1.0-0.26.pre4.el9.x86_64.rpm - extrai na tela 
+
+rpm -ivh --percent --test iftop-1.0-0.26.pre4.el9.x86_64.rpm - valida antes de instalar 
+rpm -qi iftop - mostra informação
+rpm -qa - mostra tudo que esta intalado na maquina 
+
+
+rpm -Uvh iftop-1.0-0.26.pre4.el9.x86_64.rpm - fas o upgrade do pacote atual
+
+rpm -qf /etc/vimrc
+rpm -qf /etc/hosts
+
+rpm -e iftop 
+
+rmp -Va - mostra o que foi alterado 
+
+---------------------------------------------------------------------------------------------------------------------------
+
+ldd /bin/ls
+ldd /bin/pwd   - Mostra as dlls que os programas estão usando. .dll
+
+/lib/x86_64-linux-gnu/ - um dos locais que estão armazenados as bibliotecas
+
+ldconfig -p
+ldconfig -p  |more - carrrega as bibliotecas
+
+/etc/ld.so.cache
+cd /etc/ld.so.conf.d/
+
+cat *.conf
+
+# libc default configuration
+/usr/local/lib
+# Multiarch support
+/usr/local/lib/x86_64-linux-gnu
+/lib/x86_64-linux-gnu
+/usr/lib/x86_64-linux-gnu
+
+Criando um diretorio para usar como redeferencia de biblioteca.
+
+echo "/opt/lib" > custom.conf
+
+ldd /bin/file
+
+mv /lib/x86_64-linux-gnu/libmagic.so.1*   /opt/lib/
+
+ldconfig - carrega mais informações
+
+/etc/ld.so.conf.d coloca o custom dentro dessa pasta 
+
+depois da um ldconf
+
+modulos
+
+uname -r
+modulos
+
+cd /lib/modules/5.10.0-21-amd64
+.ko
+.so
+find / -iname '*.ko'  |wc -l
+
+lsmod - mostra os modulos que estão sendo carregados
+
+modinfo e1000
+/lib/modules/5.10.0-21-amd64/kernel/drivers/net/ethernet/intel/e1000/e1000.ko - modulo que temos para a placa de rede
+
+modinfo psmouse
+/lib/modules/5.10.0-21-amd64/kernel/drivers/input/mouse/psmouse.ko
+
+rmmod psmouse - remove o modulo 
+
+
+LF
+insmod /lib/modules/5.10.0-21-amd64/kernel/drivers/input/mouse/psmouse.ko inseri o modulo 
+
+modprobe psmouse - instala direto 
+
+lspci -k
+
+processos 
+
+cat /proc -são os porcessos em execusão 
+
+
+/etc/ld.so.cache
+
+----------------------------------------------------------------------------------------------------------------------------
+
+ps -e - tras quartro informções 
+ps -ef - traz qual o id do usuario
+
+To see every process on the system using BSD syntax:           ps ax           ps axu
+
+
+To print a process tree:           ps -ejH           ps axjf - tras em arvore
+
+pstree
+pstree |more
+
+pstree -p |more
+
+pgrep - mostra o numero do processo e o programa
+pidof - tras o numero do processo 
+top - a cada tres segundos ele fica rodando, atualiza as informações
+P cpu 
+M
+
+man 7 signal 
+
+SIGTERM      P1990      Term    Termination signal
+
+SIGSTOP      P1990      Stop    Stop process
+
+SIGQUIT      P1990      Core    Quit from keyboard
+
+SIGKILL          9  
+
+
+SIGKILL          9 - matar 
+SIGQUIT          3
+SIGSTOP         19 - parar
+SIGTERM         15 - termina - pede a permissão para encerrar
+
+kill -l 
+
+reset no terminal 
+
+forground
+background 
+
+ctrl + z  = lança o processo para segundo plano - colocar em segundo plano 
+
+jobs - voce consegue vizualizar uma tarefa em segundo plano 
+
+cria e coloca direto em segundo plano vim doc02.txt &
+
+control z chama para primeiro plano 
+
+pgrep -a - tras o nome 
+
+killall -9 vim - mata todos os processos 
+
+fg
+
+pgrep -a 
+
+ps -ax -o  pid,user,nice,stat,tty,command |grep top
+
+man nohup - quando fechamos o terminal não finaliza o processo 
+
+nohup ping -c 200 192.168.1.1 &
+
+tail -f nohup.out
+
+nice
+renice
+
+-20 muito alta
+0  normal
++19 baixa
+ps -ax -o  pid,user,nice,stat,tty,commando
+
+nice -n -20 top & - prioridade alta 
+
+renice -n 15 -p 2789 - mudar 
+
+------------------------------------------------------------
+
+Gerenciamento de usuarios e grupos locais 
+
+getent passwd - mostra a base de dados de usuarios 
+
+usuario de sistema - tem privilegios bem baixo
+1 - 999 não logan 
+
+acima de 1000 - criados a cima de 1000, usuarios que logan no linux
+
+todos os usuarios tem o uid - identificador 
+
+gid - identifador de grupo 
+
+o usuario tem o grupo primario 
+
+1 - login = root 
+2 - senha = x  
+3 - uid = 0 
+4 - gid = 0 
+5 - comentário = Rogerio Silva
+6 - diretório home 
+7 - Shell
+
+vipw - fas a abertura direta do passwd - aciona o modo seguranca 
+ele não deixa de certa enquanto estiver editando o arquivo 
+
+chage -l root - mostra dados sobre o usuario 
+
+getent shadow root analista saned - mostra hash de senha e outras informações
+
+chage analista - usa para fazer as trocas 
+chage -l analista - ele lista
+
+1 - login 2 - hash senha 3 - data da ultima alteração de senha (01/01/1970) 4 - Número mínimo de dias entre troca de senhas		: 0 5 - Número máximo de dias entre troca de senhas		: 99999 6 - Número de dias de avisos antes da expiração da senha	: 7 7 -Senha inativa					: nunca
+
+chage analista
+chage -l analista
+chage -l analista
+getent shadow analista
+passwd analista
+passwd -l analista
+getent shadow analista
+passwd -u analista- desbloqueia o usuario
+
+root@debian:/# getent passwd maria
+maria:x:1001:1001:,,,:/home/maria:/bin/bash
+root@debian:/# getent shadow maria
+maria:$y$j9T$iHNgSCyTcXbbmFmA3y6Ra/$2c2XWPX9QSQADWVS6naT4yo.kDFi1o2Yl40NSyROwi/:19398:0:120:7:::
+root@debian:/# getent group maria
+maria:x:1001:
+root@debian:/# getent gshadow ,aria
+root@debian:/# getent gshadow maria
+maria:!::
+root@debian:/# 
+
+userdel -r maria - exclui tambem o diretorio home paramento -r 
+groupadd g_azul - criando um grupo 
+
+useradd -h
+
+useradd - cria um usuario 
+useradd -m -d /home/jose -g g_azul -G g_rosa,g_amarelo -u 2000 -s /bin/bash -k /etc/skel/  jose
+id jose
+getent passwd jose
+
+groupdel g_rosa - deleta um grupo 
+
+groupdel g_azul - não da para remover um grupo primario 
+usermod -g g_amarelo jose - muda de grupo
+
+criação de usuatio 
+
+
+
+
+chage -M 120 analista - quanto tempo dura a senha
+
+vim /etc/login.defs - altera em todos os usuarios 
+
+adduser - cria usuario 
+
+groupmod -h
+
+groupmod -n - renomeia o grupo 
+
+vipw -> /etc/passwd
+vipw -s -> /etc/shadow
+vigr -> /etc/group
+vigr -s -> /etc/gshadow
+
+---------------------------------------------------------------------------
+
+The pwconv command creates shadow from passwd and an optionally existing shadow.
+The pwunconv command creates passwd from passwd and shadow and then removes shadow.
+pwunconv
+getent passwd analista
+
+permissão dono e grupo - quando vc cria um aqruivo ele vincula 
+
+man pwconv
+The pwconv command creates shadow from passwd and an optionally existing shadow.
+The pwunconv command creates passwd from passwd and shadow and then removes shadow.
+pwunconv
+getent passwd analista
+getent shadow
+pwconv
+
+groupadd g_diretoria - adiciona um grupo 
+gpasswd -a analista g_diretoria - adiciona usuario analista no grupo g_diretoria
+getent group g_diretoria - mostra todos os usuarios que estão nesse grupo 
+
+chgrp g_diretoria arq01.txt  -v - mudando de um arquivo de grupo 
+
+chown analista:root arq01.txt -v
+chown analista:g_diretoria arq01.txt -v - aplicação para arquivos 
+
+touch rel/{a.txt,b.txt}
+touch rel/{a.txt,b.txt}
+
+chown analista:g_diretoria rel/ - altera o dono e grupo para uma pasta 
+
+
+
+chown -R analista:g_diretoria rel/ - altera o arquivo e o dono
+
+-   -> arquivos comuns (musicas, imagens, documentos)
+l   -> atalhos, links 
+d   -> diretórios
+
+r - read 
+w - write
+x - exec
+
+rw-r-r 
+rw - dono do arquivo 
+r - permissão do grupo 
+r - permissão de outros 
+
+u - dono
+g - grupo 
+o - para outros
+
++   -> adicionar
+-    -> remover
+
+=   -> atribuir
+
+chmod o-r arq01.txt -v - tirando permissão de leitura para o grupo outros 
+
+chmod o-r arq01.txt -v
+chmod ugo-r arq01.txt -v
+chmod u-r,g-r,o-r arq01.txt -v
+
+chmod a-r arq01.txt -v - tira a permissão de todos 
+
+chmod ug+rw,o-rwx arq01.txt -v -
+
+chmod a+x arq01.txt - altera para todos 
+
+chmod o-x arq01.txt
+
+r = 4 
+w = 2 
+x = 1
+
+1 - permissões especial 
+2 - dono 
+3 - grupo 
+4 - outros
+
+chown root:root rel
+
+chmod a+w rel
+chmod o+x rel
+
+
+chmod 777 rel
+
+-----------------------------------------------------------------------------------
+suid bit
+sgid bit
+stick bit - referenciado pela letra t e tambem referencia para outos.
+atribui que somente do dono do arquivo tera permissão de escrita no arquivo
+
+
+chmod o-t /tmp/ - remove a permissão de stick bit
+
+t
+T
+
+Stick bit = Somente o dono do arquivo ou diretório pode fazer exclusão independente se tem ou não permissão de escrita
+
+
+chmod 1777 /tmp -v 
+
+1 representa stick bit   
+
+chmod g+s devel/ - forca que seja o grupo do diretorio e não do usuario
+sgid bit
+
+corresponde ao numero 2
+
+stat mostra as permissões atuais 
+
+u+s - vincula a users
+
+suid bit = executaveis
+cat /etc/shadow
+cat /etc/shadow
+which cat
+ls -l /usr/bin/cat
+chmod u+s /usr/bin/cat - todas as vezes que o comando cat for chamado ele refencia o dono do arquivo 
+
+find / -perm /4000 2> /dev/nu
+
+660 (rw-rw----)
+
+666 - 660-----006 - isso e temporario 
+vim /root/.profile - so para o usuario root
+
+vim /etc/profile - para todos 
+
+
+programação em shell script
+
+bash -x vars.sh  - debuga o arquivo 
+
+----------------------------------------------------------------------
+
+read - le do teclado e coloca na variavel.
+
+#! /bin/bash 
+echo "Digite o nome do usuário" 
+read NOME
+echo "O nome digitado foi $NOME"
+
+vim varesp.sh
+
+#!/bin/bash 
+echo "Nome do arquivo $0"
+echo "Primeiro parametro do comando $1"
+echo "Segundo parametro do comando $2"
+echo "Todos os parametros $*"
+pwd 
+echo "Codigo de Retorno do Ultimo comando com Sucesso $?"
+ppp
+echo "Codigo de Retorno do Ultimo comando sem sucesso $?"
+
+#!/bin/bash 
+source /var/scripts/funcoes.sh
+#. /var/scripts/funcoes.sh
+menu 
+case $OPCAO in     
+1) 
+  soma                 
+   ;;         
+2) subtracao
+    ;;          
+
+0) 
+
+  echo "saindo do sistema" 
+  exit                ;;           *)                   echo "Opção invalida, chame novamente o script $0"                 ;;   esac
+
+
+------------------------------------------------------------------------------
+
+- testes - condicionais
+true
+false
+
+if [ -d /opt/trigger ]; then
+echo "Diretorio ja existente"
+else
+mkdir -pv /opt/trigger 
+fi
+
+
+if [ -d /opt/trigger ]; then  echo "Diretório já existe";  else mkdir -pv /opt/trigger;  fi
+
+if test -d /opt/trigger ; then  echo "Diretório já existe";  else mkdir -pv /opt/trigger;  fi
+
+help test
+File operators:
+-a FILE        True if file exists.
+-d FILE        True if file is a directory.
+-x FILE        True if the file is executable by you.
+-r FILE        True if file is readable by you.
+!=
+String operators:
+
+ln -s /var/scripts /home/analista/scripts
+
+ln -s /var/log/messsages /tmp/eventos - atalho 
+
+ls li - mostra o unode 
+
+ln nomes.txt lista.txt - hard link dos nome de arquivos apontanto para o mesmo local - fisico 
+
+
+--------------------------------------------------------------------------------------------
+
+systemd 
+
+systemd.service - gerenciador de serviços 
+
+ss -ntpl
+
+--all.
+--type=
+--state=
+
+
+list-units 
+
+systemctl list-units --all
+
+systemctl list-units --type=service
+
+systemctl list-unit-files --type=service --state=enabled - serviços que inicializam junto com a maquina
+
+esse também funcionou systemctl list-units --type=service --state=running
+
+systemctl is-enabled apparmor.service
+
+systemctl is-enabled apparmor.service
+
+systemctl status apparmor.service
+
+systemctl enable apparmor.service
+systemctl is-enabled apparmor.service
+systemctl status apparmor.service
+/lib/systemd/system/apparmo
+
+systemctl stop apparmor.service
+systemctl start apparmor.service
+status
+
+
+stop
+start
+systemctl restart apparmor.service
+
+systemctl reload apparmor.service
+
+systemctl stop apparmor.service
+systemctl disable apparmor.service
+
+systemctl mask apparmor.service - mascara o serviço, não tem retorno 
+
+systemctl unmask apparmor.service
+
+mascara são seviços que não vão ser utilizados 
+
+/etc/init.d/apparmor status
+cd /lib/systemd/system
+
+
+targts é um conjunto de units 
+
+ls -l *.target
+
+systemctl set-default multi-user.target - ambiente texto 
+
+systemctl set-default graphical.target
+
+
+0 - poweroff 1 - rescue 2,3,4 - multi-user 5 - graphical 6 - reboot
+
+runlevel
+
+
+------------------------------------------------------------------------------------------------------------------------------------
+
+criptografia de partição
+
+lsblk
+
+
+criar a partição
+fdisk /dev/sdc  
+
+apt update -y
+apt install cryptsetup - gerencia a partição
+-c - qual é o algoritimos suportados 
+-y - proteger com um senha passphrase
+- s - o tamanho da minha chave em bits 
+LUKS2 - sistema no formato lunix
+
+luksclose sha256
+
+/dev/sdc1
+
+/dec/mapper/crypt
+
+
+cryptsetup -y --cipher aes-cbc-essiv:sha256 --key-size 256 luksFormat /dev/sdc1
+
+lsblk -f /dev/sdc
+
+blkid /dev/sdc1
+
+
+Abri dispositivo para uso
+
+cryptsetup luksOpen /dev/sd1 crypt
+
+ls -l /dev/mapper/crypt
+
+apt install xfsprog -y 
+
+mkfs -t xfs /dev/mapper/crypt - formatar o volume 
+
+xfs_admin -L crypt /dev/mapper/crypt - dar um nome 
+new label = crypt
+
+cryptsetup luksClose crypt - fechar o dispositivo 
+
+
+mkdir data 
+mount /dev/mapper/crypt /data/
+
+não quero mais usar 
+
+sai do diretório 
+desmontar a partição umount /data/
+cryptsetup luksClose crypt 
+
+
+cryptdisks_start crypt 
+cryptdisks_stop crypt
+
+apt install autofs -y 
+
+ls -l /etc/auto.master 
+
+8 - /data /etc/auto.misc --timeout 30
+
+misc
+
+7 - crypt       -fstype=xfs,rw         :dev/mapper/crypt
+
+cd/data/crypt
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+systemctl restart autofs
+root@debian:~# systemctl enable autofs
+Synchronizing state of autofs.service with SysV service script with /lib/systemd/systemd-sysv-install.
+Executing: /lib/systemd/systemd-sysv-install enable autofs
+
+vim /etc/crypttab
+
+vim /etc/auto.master
+
+vim /etc/auto.misc
+
+
+ssh 
+
+ip - 192.168.1.1
+porta 52001]
+AllowUsers - analista - quais são os usuarios habilitados para concetar via ssh
+rootLogin- no
+
+ss -ntpl - para ver qual e a porta do ssh - estado atual das requizições
+sshd_config.d - configuração servidor 
+ssh_config.d - cliente 
+
+1-porta 52001 
+2-PermitRootLogin prohibit-password
+3-AllowUsers analista
+4-Banner /etc/issue.net - mensagem que vai aparecer.
+5-systemctl restart sshd
+
+AllowGroups
+
+DenayUsers 
+DenayGroups
+
+#PasswordAuthentication yes
+#PermitEmptyPasswords no
+
+vim sshd_config
+
+Banner /etc/issue.net - mensagem que vai aparecer.
+
+systemctl restart sshd
+
+chave privada e a chave mestre seguranca muito alta
+
+gateway - chave publica 
+intranet - chave publica 
+storage - chave publica 
+
+fas a comparação da chave privada e publica não e feito mais com senha com chave 
+a senha e muito mais facil de ser quebrada 
+
+o fas o decrption 
+
+ssh-keygen -t rsa -b 2048 -C anaslita@interno.asf.com cria a chave privada 
+
+Your identification has been saved in /home/analista/.ssh/id_rsa - privada 
+Your public key has been saved in /home/analista/.ssh/id_rsa.pub - publica 
+
+ssh-copy-id -p 52001 analista@192.168.1.1 - copiando a chave publica para o usuario anaslita 
+ 
+/home/analista/.ssh/authorized_keys - arquivo correspondente a chave publica 
+
+apt install openssh-server - instalar no debian 
+
+finger print esta no arquivo kanowhost /etc/analista/.ssh/
+
+--------------------------------------------------------------------------------
+
+ssh-copy-id -p 52010 analista@192.168.1.10
+
+scp -P 52030 /etc/issue.net analista@192.168.1.30:/tmp - fazer copia com scp 
+scp -r 52030 /etc/issue.net analista@192.168.1.30:/tmp - fazer copia com scp 
+-r recursivo para diretorio 
+
+scp -P 52030 -r /home/analista/scp/ analista@192.168.1.30:/tmp/
+
+------------------------------------------------------------------------------------------
+
+reforcar na home tem um diretorio .ssh e authoraze key onde esta a chave publica 
+ss -ntpl - mostra a porta ssh 
+/etc/hosts.deny - bloqueio de maquinas 
+
+/etc/hosts.allow - liberar 
+tcpupper 
+serviço:host 
+
+não quero que ninguem paca conexão na maquina intranet 
+vim /etc/hosts.deny 
+ALL: ALL - todos os serviços e hosts 
+sshd: 192.168.1.0/24 exept 192.168.1.1
+sshd:ALL
+
+liberar para a rede 192.168.1.
+
+sshd: 192.168.1.
+
+ldd /sbin/sshd
+
+no cent os so regras de firewal
+
+iptables -L - mostram algumas regras de firewall 
+
+vim /sbin/firewall.sh
+
+
+no firewall iptables trabalha com tres tabelas
+
+filter - resposavel pela filtragem de pacotes  
+- filter output 
+- filter input - 
+
+
+nat - usada mais para fazer manipulação de pacotes 
+mangle - 
+
+-P qual e a politica padrão 
+iptables -P INPUT DROP
+iptables -P OUTPUT DROP
+iptables -P FORWARD DROP 
+
+
+
+
+
+
+
+
