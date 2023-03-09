@@ -63,5 +63,51 @@ alterar a data - date 030810322023
 timedatectl - 
 ls -l /etc/localtime 
 
+----------------------------------------------------------------------------
 
+alterar a permissão chmod 660 /var/bind9/chroot/dev/*
+id bind - ele sobe com essa essa conta quando o serviço do dns sobe 
+chown bind:bind /var/bind9/chroot/etc/bind/rndc.key  /var/bind9/chroot/var/ -R - alterar o dono e grupo 
+chmod 775 /var/bind9/chroot/var/ -R alterando a permissão da pasta 
+cd /etc/init.d - tem alguns arquivos de serviços 
+vim named
+PIDFILE=/var/bind9/chroot/var/run/named/named/named.pif
+systemctl status bind9
+                 named 
+tail -f /var/log/messages - arquivo de log 
+
+vim /etc/apparmor.d/usr.sbin.named - configurar o appamor para que ele não bloqueie a permissaõ 
+
+adiciona /var/bind9/chroot/etc/bind/** r,
+/var/bind9/chroot/var/** rw,
+/var/bind9/chroot/dev/** rw,
+
+para colar e control + shift + v 
+
+systemctl restart apparmor - reiniciar o serviço para concluir a configuração 
+
+journalctl -xe 
+
+named.conf chamado outros arquivos zone, local, options 
+
+include "/etc/bind/named.conf.options";
+include "/etc/bind/named.conf.local";
+include "/etc/bind/named.conf.default-zones";
+
+tsig-keygen TRANSFER > tsig.key - criando a chave entre as maquinas para estabelecer a relação de confiança
+debian 10 utiliza o md5 agora no 11 o sha para algoritimo 
+
+dentro do arquivo colocar a instrução 
+
+server 192.168.1.20 {
+	keys {TRANSFER; };
+};
+
+scp -P 52020 tsig.key analista@192.168.1.20:/tmp/ - copiando o arquivo para a maquina datacenter 
+
+mv /tmp/tsig.key /etc/bind/
+
+vim /etc/bind/named.conf
+
+git clone https://github.com/rogerramossilva/linuxforce
 
