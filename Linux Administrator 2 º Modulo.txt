@@ -111,3 +111,57 @@ vim /etc/bind/named.conf
 
 git clone https://github.com/rogerramossilva/linuxforce
 
+-------------------------------------------------------------------------------------------------
+
+copiar estes arquivos intranet 
+cp /root/linuxforce/intranet/bind_chroot/etc/bind/named.conf.* /etc/bind/
+
+cp /root/linuxforce/intranet/bind_chroot/bind/* /var/bind9/chroot/var/cache/bind/ -v
+
+chattr -i /etc/resolv.conf
+lsattr /etc/resolv.conf
+
+copia dos arquivos na maquina datacenter 
+cp /root/linuxforce/datacenter/bind_chroot/etc/bind/named.conf.* /etc/bind/ -v
+
+intranet 
+
+vim /etc/bind/name.conf.options
+
+/var/cache/bind - qual é o diretório que sera usado para armqzenadmento de arquivos de zona 
+arquivos de zona mostram quais os dominios que dns local será reponsavel 
+/var/bind9/chroot 
+
+version - mostra qual e a versão do dns, porem não mostra a versão 
+dnsssec-enable - analise de seguranca, verifica se um dominio e verdadeiro ou não.
+allow-query - quem pode utilizar o dns para consultas
+allow-recursion - permite a autorização para consultas recursivas para root-servers 
+allow-transfer - so e permitida para que tem a chave transfer key TRANSFER 
+notify yes - emitir notificação para o slave 
+forwarders - 8.8.8.8
+listen-on-v6 - suporta ipv6
+
+Poucas mudandas no arquivo na datacenter pois não emitira notificação e trasnferencia tambem não pois ja e a slave
+
+
+vim /etc/bind/name.conf.default-zone
+
+root.hints - qual e relação dos root-servers 
+
+cat /usr/share/dns/root.hints - mostra os nameservers 
+
+; OPERATED BY VERISIGN, INC.
+;
+.                        3600000      NS    J.ROOT-SERVERS.NET.
+J.ROOT-SERVERS.NET.      3600000      A     192.58.128.30
+J.ROOT-SERVERS.NET.      3600000      AAAA  2001:503:c27::2:30
+
+
+cp -p /usr/share/dns/root.hints /var/bind9/chroot/var/cache/bind/ 
+
+named-checkconf 
+/etc/bind/.named.conf.options.swp
+
+
+
+
