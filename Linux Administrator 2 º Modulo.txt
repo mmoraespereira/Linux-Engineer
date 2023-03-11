@@ -162,6 +162,72 @@ cp -p /usr/share/dns/root.hints /var/bind9/chroot/var/cache/bind/
 named-checkconf 
 /etc/bind/.named.conf.options.swp
 
+-------------------------------------------------------------------------------------------------
+
+arquivo zones o nome da zona e ponto para acessar os root servers 
+
+named.local - arquivo que fas as tratativas de um novo dominio 
+
+
+cliente Interno www.asf.com 192.168.1.50
+
+
+cliente externo www.asf.com 200.50.100.50
+
+ferramenta rndc 
+
+acl rede interna e rede externa
+view interna e externa 
+
+math-clientes {redeexterna} rede 200.50.100.
+type master - qual dominio que eu estou sendo responsavel 
+file db.asf.externa - onde eu vou sinaliza quando uma consulta vim da rede externa para acesso a rede interna
+
+zona reversa - passa o endereço ip e tenta descobri qual e o nome que esta vinculado 
+
+100.50.200.in-addr.arpa
+200.50.100.    (50)
+50   ->  www.asf.com
+
+Externa db.asf.externa rev.asf.externa
+Interna db.asf.interna rev.asf.interna
+
+Registro do tipo A aponta o ip versão 4
+CNAME - nome 
+
+Quem são os servidores do dominio NS - Nameserver
+MX - Mail Exchange - quem e o servidor de email dominio asf.com
+
+dig +short @8.8.8.8 gmail.com mx - tras os servidores de email e sua prioridade
+
+toda zona dns tem pelo menos um SOA - tem algumas informações de espelhamento com o slave e master 
+como serial 
+
+TTL - 7200 periodo que fica salvo no cache
+YYYYMMDDHH
+
+
+dig +short www.asf.com
+dig +short gateway.asf.com
+
+
+named-checkzone asf.com db.asf.interna
+
+dig +short asf.com ns
+dig +short asf.com mx
+dig +short asf.com soa
+dig +short gateway.asf.com
+
+/var/bind9/chroot/var/cache/bind - onde estão os arquivos de zona 
+
+
+
+
+
+
+
+
+
 
 
 
