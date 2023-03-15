@@ -220,6 +220,56 @@ dig +short gateway.asf.com
 
 /var/bind9/chroot/var/cache/bind - onde estão os arquivos de zona 
 
+-----------------------------------------------------------------------------
+
+arquivo rev.as.interna
+
+reverse a passagem do endereço ip e o retorno do nome 
+
+PTR - tras um apontamento do endereço ip por um nomo ele tras a ultima parte do endereço 
+ponteiro ip 10  - intranet ele esta na zona 
+
+SOA - informação qual o dns principal que e reposndsavel 
+
+no registro do reverse voçe usa ptr 
+
+dig +short -x 192.168.1.10 para testar se deu certo o reverse usa o parametro mais -x
+
+200.50.100.10 e 200.50.100.20 - estão fixados na maquina gateway 
+
+200.50.100.100 - cliente externo 
+
+maquina gatewal ssh -p 52001 analista@192.168.1.1
+
+vim /sbin/firewal.sh 
+-i - input 
+-s - source ip de origem 
+-d - destino 
+
+NAT Seesion 
+DNAT - mudança de de destino $IJNT:53 variavel de ambiente que aponto para o 192.168.1.10:53 na porta 53
+
+asf.com -> 200.50.100.10
+
+SPF - sender policy framwork - qual ip versão 4 esta autorizado externamente para atender o dns
+
+toda saida da maquina gatewal tem que fazer uma regra para poder enviar resquições a servidores OUTPUT 
+--sport 53
+-s ip de origem
+
+output - tudo que sai da maquina gatewal 
+input - tudo que entra na sua maquina gatewal 
+foward - tudo que são transitorias que passa pela maquina gatewal  
+
+para executar as alterações feitas no firewal executa o sh  
+
+ping -c 2 200.50.100.10
+
+
+dig +short -x 200.50.100.10
+dig +short 200.50.100.10
+dig +short www.asf.com
+
 
 
 
