@@ -270,12 +270,51 @@ dig +short -x 200.50.100.10
 dig +short 200.50.100.10
 dig +short www.asf.com
 
+-----------------------------------------------------------------------------------------
+ldap - base de dados ldap - cadasto de usuario e grupos 
+onde os usuarios de comum acesso eles vão estar dentro do ldap 
+onde os usuarios e grupos a estrutra vai ser criada dc = asf, dc=com
+ou - usuarios - unidade organizacional 
 
+uid=rogerio 
+cn=rogerio 
 
+apt install slapd ldap-utils -y    - instalação do ldap 
 
+systemctl enable slapd - colocar na inicialização do sistema 
+systemctl is-enabled slapd - verificar se esta habilitado 
+systemctl stop slapd - para o serviço
 
+ldap.conf - arquivo de configuração do cliente ldap 
+salsl-atutenticação 
 
+pasta schema - e o que vai permitir que vc tenha os campos necessarios para ter a estrutura 
 
+core.schema - e um dos principais que vai ser usado.
+
+slapd.d - e usado para indexação depois que ele faz a leitura da base dados captura das informações, ele atualiza aqui as informações que foram alteradas 
+
+slapd.conf - principal arquivo de configuração não esta dentro da estrutura 
+cd /usr/share/doc/slapd/examples
+slapd.conf.gz - e um exemplo de um arquivo de configuração que precizamos 
+
+gzip -k -d /usr/share/doc/slapd/examples/slapd.conf.gz -c > /etc/ldap/slapd.conf - criando o arquivo 
+pidfile - onde que vai ficar guardado o numero do processo /var/run/slapd/slapd.pid
+argsfile - argumentos que vão ser inicializado com o sistema, usuario padrão e grupo, ja sobe o serviço com esse usuario e grupo /var/run/slapd/slapd.args
+loglevel - a configuração do tipo da informação que vai ser carregada 
+
+acessar o manual man 5 slapd.conf
+
+1 - trace algumas chamadas para funções
+loglevel 0x1
+loglevel trace
+loglevel 0x3
+loglevel trace packets
+logfile <filename>
+
+modulos - back_bdb - banco de dados local 
+
+/var/lib/ldap - o banco de dados vai ficar armazenado 
 
 
 
