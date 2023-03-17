@@ -752,4 +752,81 @@ root@datacenter:/etc/ldap# ldapmodify -x -D cn=admin,dc=asf,dc=com -f shell.ldif
 Enter LDAP Password: 
 modifying entry "uid=sophia,ou=People,dc=asf,dc=com"
 
+root@datacenter:/etc/ldap# ldapsearch -x -b dc=asf,dc=com uid=sophia -LLL
+dn: uid=sophia,ou=People,dc=asf,dc=com
+uid: sophia
+cn: sophia
+objectClass: account
+objectClass: posixAccount
+objectClass: top
+objectClass: shadowAccount
+shadowMax: 99999
+shadowWarning: 7
+uidNumber: 5002
+gidNumber: 5000
+homeDirectory: /home/sophia
+loginShell: /bin/bash
 
+--------------------------------------------------------------------------------------------------------
+
+fazer um backup das configuraçoes
+systemctl stop slapd - para o serviço do slapd 
+
+backup 
+remoção 
+restore 
+
+slapcat -l /var/backups/bkpldap.ldif
+-l paramentro usado para que o processo seja feito 
+
+systemctl start slapd - inciar o serviço novamente
+
+fazer o restore 
+
+ldapdelete -x -D cn=admin,dc=asf,dc=com -r dc=asf,dc=com -W - fazer a remocão da base 
+-r - remover 
+
+systemctl stop slapd- para o serviço 
+
+slapadd -cl /var/backups/bkpldap.ldif 
+-c - ignorar os erros
+ l - apontar o arquivo ldif
+
+systemctl start slapd - inicia novamente 
+ldapsearch -x -b dc=asf,dc=com uid=sophia -LLL - testar para ver se encontra o registro do usuario 
+
+implementação da parte grafica para gerenciar 
+
+pacotes 
+
+- precisa do servidor web apache
+- programa - ladpacountmaneger
+- configuração interna 
+
+apt -y install apache2 php php-cgi libapache2-mod-php php-mbstring php-common php-pear - instação dos pacotes 
+
+apt install ldap-account-manager -y
+
+cd /etc/apache2/conf-available/ - entrar nesse diretorio 
+
+vim ldap-account-manager.conf
+
+http://localhost/lam/templates/login.php - acessar o sistema 
+apos vai em lam-configuration
+edit servers
+acesse com a senha lam
+
+ServerAddres: ldap://192.168.1.20:389
+
+Tree suffix =dc=asf,dc=com
+List of valid users = cn=admin,dc=asf,dc=com
+
+Sincronização do cliente interno com o ldadp 
+
+dpkg-reconfigure - aparece as perguntas novamente 
+
+pam-auth-update - marcar a opção para criar o diretorio home quando se autenticar 
+
+
+
+fsck -f /dev/sda1
