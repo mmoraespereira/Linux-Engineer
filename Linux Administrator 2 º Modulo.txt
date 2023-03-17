@@ -316,7 +316,440 @@ modulos - back_bdb - banco de dados local
 
 /var/lib/ldap - o banco de dados vai ficar armazenado 
 
+-------------------------------------------------------------------------------------
+
+mover o slapd.d para o /var/backup 
+
+mv slapd.d /var/backups/
+
+apos cria o diretorio mkdir slapd.d
+chown openldap:openldap -R /var/lib/ldap/ /etc/ldap/slapd.d/ - mudar o usuario e grupo ldap etc banco de dados 
+
+1-slaptest -f slapd.conf -F slapd.d/ - testar para ver se esta certo 
+/var/lib/ldap/id2entry.bdb) failed: No such fil - faltou um arquivo 
+
+2-reiniciar systemctl restart slapd - para gerar o arquivo 
+
+3-chown openldap:openldap -R /var/lib/ldap/ /etc/ldap/slapd.d/
+
+4-slaptest -f slapd.conf -F slapd.d/
+
+root@datacenter:/etc/ldap# slaptest -f slapd.conf -F slapd.d/
+641265fd slapd.conf: line 102: rootdn is always granted unlimited privileges.
+641265fd slapd.conf: line 119: rootdn is always granted unlimited privileges.
+config file testing succeeded
+
+slapcat - vai fazer uma leitura da base de dados e vai trazer os registros as informaçoes previamente cadastradas porem não tem nenhuma informação cadastrada
+
+Cadastrar usuarios e grupos local, depois gerar um script ele vai gerar um arquivo de importação, dai vari dentro da linha de comando dentro do ldap e fazer a importação
+
+1 - criar usuraios e grupos locais
+2 - gerar o ldif
+3 - importar o ldif 
+
+1 - root@datacenter:/etc/ldap# groupadd -g 5000 g_ti 
+root@datacenter:/etc/ldap# groupadd -g 5001 g_diretoria 
+root@datacenter:/etc/ldap# groupadd -g 5002 g_suporte 
+useradd -m -k /etc/skel/ -s /bin/bash -u 5000 -g g_ti -G g_diretoria,g_suporte kamila
+useradd -m -k /etc/skel/ -s /bin/bash -u 5001 -g g_ti -G g_diretoria,g_suporte rafaela
+useradd -m -k /etc/skel/ -s /bin/sh -u 5002 -g g_ti -G g_diretoria,g_suporte sophia
+
+passwd kamila
+passwd rafela 
+passwd sophia
+
+apt install migrationtools -y - conjunto de scripts 
+cd /usr/share/migrationtools
+
+apt install file - da para ver o tipo do arquivo 
+file *
+
+migrations_common.ph
+migration_base.pl
+migration_passwd.pl
+migration_group.pl 
+
+vim migrate_common.ph
+
+linha 71 configuração 
+linha 74
+a partir da linha 85
+
+vim migration_base.pl
+
+require '/usr/share/migrationtools/migrate_common.ph'
+
+./migrate_base.pl > /etc/ldap/base.ldif - ele cria as unidade organizacionais 
+
+vim migrate_group.pl
+
+./migrate_group.pl /etc/group /etc/ldap/groups.ldif
+
+vim migrate_passwd.pl
+
+./migrate_passwd.pl /etc/passwd /etc/ldap/users.ldif
+
+cd /etc/ldap	
+ls -l *.ldif
+
+realizar o processo de importação 
+
+ldapadd -x -D cn=admin,dc=asf,dc=com -f base.ldif -W - comando utilizado para fazer a importação desse arquivo 
+
+-x = autenticação simples
+-D = informa qual o usuario que tem permissão para isso, credenciais do usuario admin
+-f = qual o arquivo
+-W - pedir a senha do usuario.
+
+root@datacenter:/etc/ldap# ldapadd -x -D cn=admin,dc=asf,dc=com -f base.ldif -W 
+Enter LDAP Password: 
+adding new entry "dc=asf,dc=com"
+
+adding new entry "ou=Rpc,dc=asf,dc=com"
+
+adding new entry "ou=People,dc=asf,dc=com"
+
+adding new entry "ou=Hosts,dc=asf,dc=com"
+
+adding new entry "nisMapName=netgroup.byuser,dc=asf,dc=com"
+
+adding new entry "ou=Netgroup,dc=asf,dc=com"
+
+adding new entry "ou=Mounts,dc=asf,dc=com"
+
+adding new entry "ou=Aliases,dc=asf,dc=com"
+
+adding new entry "ou=Services,dc=asf,dc=com"
+
+adding new entry "ou=Group,dc=asf,dc=com"
+
+adding new entry "ou=Networks,dc=asf,dc=com"
+
+adding new entry "nisMapName=netgroup.byhost,dc=asf,dc=com"
+
+adding new entry "ou=Protocols,dc=asf,dc=com"
 
 
+ldapadd -x -D cn=admin,dc=asf,dc=com -f groups.ldif -W - importação dos grupos
+
+root@datacenter:/etc/ldap# ldapadd -x -D cn=admin,dc=asf,dc=com -f groups.ldif -W 
+Enter LDAP Password: 
+adding new entry "cn=g_ti,ou=Group,dc=asf,dc=com"
+
+adding new entry "cn=g_diretoria,ou=Group,dc=asf,dc=com"
+
+adding new entry "cn=g_suporte,ou=Group,dc=asf,dc=com"
+
+
+ldapadd -x -D cn=admin,dc=asf,dc=com -f users.ldif -W - importar os usuarios
+
+root@datacenter:/etc/ldap# ldapadd -x -D cn=admin,dc=asf,dc=com -f users.ldif -W 
+Enter LDAP Password: 
+adding new entry "uid=kamila,ou=People,dc=asf,dc=com"
+
+adding new entry "uid=rafaela,ou=People,dc=asf,dc=com"
+
+adding new entry "uid=sophia,ou=People,dc=asf,dc=com"
+
+
+slapcat - mostra as atualização da base dados
+
+root@datacenter:/etc/ldap# slapcat 
+dn: dc=asf,dc=com
+dc: asf
+objectClass: top
+objectClass: domain
+structuralObjectClass: domain
+entryUUID: ec7e1b4a-5911-103d-933d-e3c0eb115033
+creatorsName: cn=admin,dc=asf,dc=com
+createTimestamp: 20230317131817Z
+entryCSN: 20230317131817.135351Z#000000#000#000000
+modifiersName: cn=admin,dc=asf,dc=com
+modifyTimestamp: 20230317131817Z
+
+dn: ou=Rpc,dc=asf,dc=com
+ou: Rpc
+objectClass: top
+objectClass: organizationalUnit
+structuralObjectClass: organizationalUnit
+entryUUID: ec8122ea-5911-103d-933e-e3c0eb115033
+creatorsName: cn=admin,dc=asf,dc=com
+createTimestamp: 20230317131817Z
+entryCSN: 20230317131817.155202Z#000000#000#000000
+modifiersName: cn=admin,dc=asf,dc=com
+modifyTimestamp: 20230317131817Z
+
+dn: ou=People,dc=asf,dc=com
+ou: People
+objectClass: top
+objectClass: organizationalUnit
+structuralObjectClass: organizationalUnit
+entryUUID: ec8292ba-5911-103d-933f-e3c0eb115033
+creatorsName: cn=admin,dc=asf,dc=com
+createTimestamp: 20230317131817Z
+entryCSN: 20230317131817.164624Z#000000#000#000000
+modifiersName: cn=admin,dc=asf,dc=com
+modifyTimestamp: 20230317131817Z
+
+dn: ou=Hosts,dc=asf,dc=com
+ou: Hosts
+objectClass: top
+objectClass: organizationalUnit
+structuralObjectClass: organizationalUnit
+entryUUID: ec830cd6-5911-103d-9340-e3c0eb115033
+creatorsName: cn=admin,dc=asf,dc=com
+createTimestamp: 20230317131817Z
+entryCSN: 20230317131817.167750Z#000000#000#000000
+modifiersName: cn=admin,dc=asf,dc=com
+modifyTimestamp: 20230317131817Z
+
+dn: nisMapName=netgroup.byuser,dc=asf,dc=com
+nisMapName: netgroup.byuser
+objectClass: top
+objectClass: nisMap
+structuralObjectClass: nisMap
+entryUUID: ec8397d2-5911-103d-9341-e3c0eb115033
+creatorsName: cn=admin,dc=asf,dc=com
+createTimestamp: 20230317131817Z
+entryCSN: 20230317131817.171307Z#000000#000#000000
+modifiersName: cn=admin,dc=asf,dc=com
+modifyTimestamp: 20230317131817Z
+
+dn: ou=Netgroup,dc=asf,dc=com
+ou: Netgroup
+objectClass: top
+objectClass: organizationalUnit
+structuralObjectClass: organizationalUnit
+entryUUID: ec845c9e-5911-103d-9342-e3c0eb115033
+creatorsName: cn=admin,dc=asf,dc=com
+createTimestamp: 20230317131817Z
+entryCSN: 20230317131817.176346Z#000000#000#000000
+modifiersName: cn=admin,dc=asf,dc=com
+modifyTimestamp: 20230317131817Z
+
+dn: ou=Mounts,dc=asf,dc=com
+ou: Mounts
+objectClass: top
+objectClass: organizationalUnit
+structuralObjectClass: organizationalUnit
+entryUUID: ec84d70a-5911-103d-9343-e3c0eb115033
+creatorsName: cn=admin,dc=asf,dc=com
+createTimestamp: 20230317131817Z
+entryCSN: 20230317131817.179480Z#000000#000#000000
+modifiersName: cn=admin,dc=asf,dc=com
+modifyTimestamp: 20230317131817Z
+
+dn: ou=Aliases,dc=asf,dc=com
+ou: Aliases
+objectClass: top
+objectClass: organizationalUnit
+structuralObjectClass: organizationalUnit
+entryUUID: ec85618e-5911-103d-9344-e3c0eb115033
+creatorsName: cn=admin,dc=asf,dc=com
+createTimestamp: 20230317131817Z
+entryCSN: 20230317131817.183025Z#000000#000#000000
+modifiersName: cn=admin,dc=asf,dc=com
+modifyTimestamp: 20230317131817Z
+
+dn: ou=Services,dc=asf,dc=com
+ou: Services
+objectClass: top
+objectClass: organizationalUnit
+structuralObjectClass: organizationalUnit
+entryUUID: ec863d70-5911-103d-9345-e3c0eb115033
+creatorsName: cn=admin,dc=asf,dc=com
+createTimestamp: 20230317131817Z
+entryCSN: 20230317131817.188648Z#000000#000#000000
+modifiersName: cn=admin,dc=asf,dc=com
+modifyTimestamp: 20230317131817Z
+
+dn: ou=Group,dc=asf,dc=com
+ou: Group
+objectClass: top
+objectClass: organizationalUnit
+structuralObjectClass: organizationalUnit
+entryUUID: ec86cda8-5911-103d-9346-e3c0eb115033
+creatorsName: cn=admin,dc=asf,dc=com
+createTimestamp: 20230317131817Z
+entryCSN: 20230317131817.192348Z#000000#000#000000
+modifiersName: cn=admin,dc=asf,dc=com
+modifyTimestamp: 20230317131817Z
+
+dn: ou=Networks,dc=asf,dc=com
+ou: Networks
+objectClass: top
+objectClass: organizationalUnit
+structuralObjectClass: organizationalUnit
+entryUUID: ec87472e-5911-103d-9347-e3c0eb115033
+creatorsName: cn=admin,dc=asf,dc=com
+createTimestamp: 20230317131817Z
+entryCSN: 20230317131817.195458Z#000000#000#000000
+modifiersName: cn=admin,dc=asf,dc=com
+modifyTimestamp: 20230317131817Z
+
+dn: nisMapName=netgroup.byhost,dc=asf,dc=com
+nisMapName: netgroup.byhost
+objectClass: top
+objectClass: nisMap
+structuralObjectClass: nisMap
+entryUUID: ec8840de-5911-103d-9348-e3c0eb115033
+creatorsName: cn=admin,dc=asf,dc=com
+createTimestamp: 20230317131817Z
+entryCSN: 20230317131817.201847Z#000000#000#000000
+modifiersName: cn=admin,dc=asf,dc=com
+modifyTimestamp: 20230317131817Z
+
+dn: ou=Protocols,dc=asf,dc=com
+ou: Protocols
+objectClass: top
+objectClass: organizationalUnit
+structuralObjectClass: organizationalUnit
+entryUUID: ec88c022-5911-103d-9349-e3c0eb115033
+creatorsName: cn=admin,dc=asf,dc=com
+createTimestamp: 20230317131817Z
+entryCSN: 20230317131817.205108Z#000000#000#000000
+modifiersName: cn=admin,dc=asf,dc=com
+modifyTimestamp: 20230317131817Z
+
+dn: cn=g_ti,ou=Group,dc=asf,dc=com
+objectClass: posixGroup
+objectClass: top
+cn: g_ti
+userPassword:: e2NyeXB0fXg=
+gidNumber: 5000
+structuralObjectClass: posixGroup
+entryUUID: 26652f56-5912-103d-934a-e3c0eb115033
+creatorsName: cn=admin,dc=asf,dc=com
+createTimestamp: 20230317131954Z
+entryCSN: 20230317131954.279876Z#000000#000#000000
+modifiersName: cn=admin,dc=asf,dc=com
+modifyTimestamp: 20230317131954Z
+
+dn: cn=g_diretoria,ou=Group,dc=asf,dc=com
+objectClass: posixGroup
+objectClass: top
+cn: g_diretoria
+userPassword:: e2NyeXB0fXg=
+gidNumber: 5001
+memberUid: kamila
+memberUid: rafaela
+memberUid: sophia
+structuralObjectClass: posixGroup
+entryUUID: 2666ce24-5912-103d-934b-e3c0eb115033
+creatorsName: cn=admin,dc=asf,dc=com
+createTimestamp: 20230317131954Z
+entryCSN: 20230317131954.290495Z#000000#000#000000
+modifiersName: cn=admin,dc=asf,dc=com
+modifyTimestamp: 20230317131954Z
+
+dn: cn=g_suporte,ou=Group,dc=asf,dc=com
+objectClass: posixGroup
+objectClass: top
+cn: g_suporte
+userPassword:: e2NyeXB0fXg=
+gidNumber: 5002
+memberUid: kamila
+memberUid: rafaela
+memberUid: sophia
+structuralObjectClass: posixGroup
+entryUUID: 26674d04-5912-103d-934c-e3c0eb115033
+creatorsName: cn=admin,dc=asf,dc=com
+createTimestamp: 20230317131954Z
+entryCSN: 20230317131954.293745Z#000000#000#000000
+modifiersName: cn=admin,dc=asf,dc=com
+modifyTimestamp: 20230317131954Z
+
+dn: uid=kamila,ou=People,dc=asf,dc=com
+uid: kamila
+cn: kamila
+objectClass: account
+objectClass: posixAccount
+objectClass: top
+objectClass: shadowAccount
+userPassword:: e2NyeXB0fSR5JGo5VCRxV0sxVERxSlVwenJoSEU0OEVhVjMuJEk3bDZjdjFDL
+ kpIeEZLL2Y4MndINzltU2lQVVBXYjhxdTI0SWhUWXZBNy4=
+shadowLastChange: 19432
+shadowMax: 99999
+shadowWarning: 7
+loginShell: /bin/bash
+uidNumber: 5000
+gidNumber: 5000
+homeDirectory: /home/kamila
+structuralObjectClass: account
+entryUUID: 553a720a-5912-103d-934d-e3c0eb115033
+creatorsName: cn=admin,dc=asf,dc=com
+createTimestamp: 20230317132112Z
+entryCSN: 20230317132112.852696Z#000000#000#000000
+modifiersName: cn=admin,dc=asf,dc=com
+modifyTimestamp: 20230317132112Z
+
+dn: uid=rafaela,ou=People,dc=asf,dc=com
+uid: rafaela
+cn: rafaela
+objectClass: account
+objectClass: posixAccount
+objectClass: top
+objectClass: shadowAccount
+userPassword:: e2NyeXB0fSR5JGo5VCRHcmdyNWdtTDU2NmJpeVB5T1o1RjIxJDRNMEViWmp0Q
+ nl2VG9GOFU4NUxLT1BZajhSdjNTQmZmU3NlV1RJc3phOC8=
+shadowLastChange: 19432
+shadowMax: 99999
+shadowWarning: 7
+loginShell: /bin/bash
+uidNumber: 5001
+gidNumber: 5000
+homeDirectory: /home/rafaela
+structuralObjectClass: account
+entryUUID: 553b770e-5912-103d-934e-e3c0eb115033
+creatorsName: cn=admin,dc=asf,dc=com
+createTimestamp: 20230317132112Z
+entryCSN: 20230317132112.859376Z#000000#000#000000
+modifiersName: cn=admin,dc=asf,dc=com
+modifyTimestamp: 20230317132112Z
+
+dn: uid=sophia,ou=People,dc=asf,dc=com
+uid: sophia
+cn: sophia
+objectClass: account
+objectClass: posixAccount
+objectClass: top
+objectClass: shadowAccount
+userPassword:: e2NyeXB0fSR5JGo5VCRzM1UyTDRmcjVIQ0FJdWZrckZsOFowJHI5cTJKb0ZSZ
+ 09xd0RDajhIbmdURWFUaGF1RjYvQ2ZTVURaYU9VdW1VaEI=
+shadowLastChange: 19432
+shadowMax: 99999
+shadowWarning: 7
+loginShell: /bin/sh
+uidNumber: 5002
+gidNumber: 5000
+homeDirectory: /home/sophia
+structuralObjectClass: account
+entryUUID: 553c631c-5912-103d-934f-e3c0eb115033
+creatorsName: cn=admin,dc=asf,dc=com
+createTimestamp: 20230317132112Z
+entryCSN: 20230317132112.865419Z#000000#000#000000
+modifiersName: cn=admin,dc=asf,dc=com
+modifyTimestamp: 20230317132112Z
+
+
+ldapsearch -x -b dc=asf,dc=com uid=sophia -LLL - registro especifico ex de um usuario sophia
+-LLL - para não trazer informações desnecessarias 
+
+para criar um outro usuario poderia usar como exemplos o arquivo user.ldif alterar o nome do usuario
+
+alterar o shell dos usuarios no caso sophia estava com /bin/sh 
+dn: uid=sophia,ou=People,dc=asf,dc=com
+
+criar um arquivo Shell.ldif
+dn: uid=sophia,ou:People,dc=asf,dc=com
+changetype: modify - tipo de mudança
+replace: loginShell - substituir
+loginShell: /bin/bash - 
+
+ldapmodify -x -D cn=admin,dc=asf,dc=com -f shell.ldif -W - fazendo a subsituição da palavra no campo loginShell
+
+root@datacenter:/etc/ldap# ldapmodify -x -D cn=admin,dc=asf,dc=com -f shell.ldif -W
+Enter LDAP Password: 
+modifying entry "uid=sophia,ou=People,dc=asf,dc=com"
 
 
