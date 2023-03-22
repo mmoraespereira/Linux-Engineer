@@ -830,3 +830,68 @@ pam-auth-update - marcar a opção para criar o diretorio home quando se autenti
 
 
 fsck -f /dev/sda1
+
+--------------------------------------------------------------------------------
+
+MTA- agente responsavel pelo transporte das suas mesagens email, prover um serviço de email
+
+papel de delivery - a recpção das mensagens, ant spam  MDA mail delivery agent 
+
+Mua - leitura de email, interface para o usuario ex thunderbird 
+smtp(25)
+smtps(465.87) 
+
+MAA - POP3 IMAP pega as mensagens e tras para o usuario para dentro do MUA
+IMAP - mantem uma copia da mensagem no servidor  
+
+MTA(postfix) + MAA(devocot)+MUA(Mozilla Thunderbird)
+
+apt install postfix procmail bsd-mailx -y
+
+systemctl status postfix 
+
+smtps(25,465,587)
+POP3(110,995)
+IMAPs(143,993)
+vim /etc/services
+
+serviço dovecot-core 
+
+apt install dovecot-core dovecot-pop3d dovecot-imapd -y
+
+cd /etc/dovecot
+
+dovecot.conf arquivo principal de configuração mais tem outras configuração em outros arquivos
+vim dovecot.conf 
+
+na linha 30 tira o comentario  quais os endereços ips que vai estar vinculado 
+
+cd conf.d
+
+vim 10.auth.conf
+
+vim 10-mail.conf - caminho da mial mailbox vai indicar para o POP e IMAP o caminho da mailbox - onde esta as mensagenss~
+
+vim 10.master.conf - tras uma especificação para o serviço mta 
+
+na linha 106 adiona o usuario e o grupo 
+
+reinciar o serviço do dovect para aplicar a configuração nos arquivos
+
+ss -ntpl |grep "dovect"
+
+apos isso ele habilitou as outras portas e configuradas 995, 143 
+
+cd /etc/postfix/ 
+
+main.cf 
+master.cf- arquivos principais de configuração 
+vim master.cf
+
+submission - habilita porta 587 smtps
+smtps - hablita a 465
+
+systemctl restart postfix 
+
+
+
