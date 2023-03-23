@@ -893,5 +893,142 @@ smtps - hablita a 465
 
 systemctl restart postfix 
 
+vim nslcd.conf - erro para reconfigurar alterado o arquivo direto 
+
+----------------------------------------------------------------------------------------
+
+configuração do postifix
+
+cd /etc/postfix
+
+vim main.cf
+
+postconf - atributo - valor
+
+man 5 postconf
+
+postconf -e "parameter=value" ... - tem duas formas de alterar o arquivo main.conf 
+
+entrando no arquivo main.conf ou postconf -e 
+
+uma forma de fazer a declaração por linha de comando = postconf -e myorigin=asf.com
+
+copiar este aqruivo de configuração para o /etc/postfix - cp /root/linuxforce/datacenter/postfix/etc/postfix/main.cf /etc/postfix/
+
+vim main.cf
+
+smtpd_banner MTA ASF CYbersecurity- o usuario que estiver fazendo a conexão vai aparecer esse texto 
+
+append_dit_mydomain = yes - auto completa com o dominio do email quando digitar o usuario 
+
+inserir uma nova linha com mydomain = asf.com
+
+myorigin = asf.com mesma configuração 
+
+myhostname = datacenter.asf.com - não tem a necessidade de ser esse nome - ele tras esse nome 
+vai no cabecalho do email 
+
+alias ela e do tipo hash - ele e um texto compilado e gera um codigo não legivel, acessar de forma mais rapido a informação 
+
+para vc forma o hash vai tem que ter em texto o alias
+
+tail -f /var/log/mail.log
+vim /etc/aliases
+
+criar um aliases
+
+rh: kamila@asf.com - todo email que chegar no rh vai para kamila
+ti: rafaela@asf.com	
+
+name: value1, value2, - chegar para dois emails especificos 
+
+postalias /etc/aliases - apos roda o arquivo para compilar 
+
+ls -l /etc/aliases*
+
+cat /etc/hosts |mail -s "Teste 01 - Aliases" ti@asf.com - mandar um email 
+
+root@datacenter:/etc/postfix# mailq
+Mail queue is empty
+root@datacenter:/etc/postfix# postqueue -p  -   para ver se tem mensagens na fila que não foram enviadas 
+Mail queue is empty
+root@datacenter:/etc/postfix# 
+
+vim main.cf
+
+mudestionation - quais são os destinos confiaveis 
+
+smpt.asf.com, pop.asf.com, imp.asf.com
+
+quando estiver configurando o mua esses dois serviços 
+
+relayhost - criar um servidor confiavel para ele trasmitir o email depois
+
+mynetworks - quais as redes ou endereços ips que ele esta autorizando esse servidor para envio de mensagem
+127.0.0.0/8 192.168.1.0/24 - vai conseguir utilizar o servidor de email
+
+analista@debian:~$ telnet 192.168.1.20 25
+Trying 192.168.1.20...
+Connected to 192.168.1.20.
+Escape character is '^]'.
+220 MTA ASF Cybersecurity
+
+consultar para ver se esta conectando ao servidor 220 - testes ok 
+
+helo mail
+250 datacenter.asf.com - identificação da maquina 
+
+mail from: root@asf.com - remetente - origem 
+250 2.1.0 Ok - se o codigo for 4 ou 5 e sinal de erro 
+
+rcpt to: rh@asf.com - destino 
+250 2.1.5 Ok
+~
+
+data - mensagem 
+354 End data with <CR><LF>.<CR><LF>
+subject: Teste 02 - Telnet cliente interno - titulo 
+
+Testando conexão via cliente interno 
+					- corpo da mensagem 
+.
+250 2.0.0 Ok: queued as 07FBF602D8 - gerou o hash 
+
+quit
+221 2.0.0 Bye
+Connection closed by foreign host.
+analista@debian:~$ 
+
+autentição (sasl) e encriptação(tls)
+
+permit_sals_autheticaçao , permit_mynetworks 
 
 
+tls - encriptação 
+
+vir presizar de uma chave ou certificado 
+certificado .crt 
+.key e a chave do certificado
+
+CA - autoridade certificadora que ira validar o cerficado 
+
+mailbox_size_limit - tomanho da sua caixa local caixa postal  
+message_size_limit - tamanho da sua mensagem 100000 - 10 mb 
+
+inet_interfaces - all - todas as placa de rede
+
+/home/sophia/Maildir - ele cria essa pasta com os dados dos emails
+
+disable_vrfy_command = ele não permite a busca das contas de email 
+
+apt install maildrop -y
+
+criando esses diretorios 
+
+root@datacenter:/etc/skel# maildirmake Maildir
+root@datacenter:/etc/skel# maildirmake Maildir/.Enviados
+root@datacenter:/etc/skel# maildirmake Maildir/.Rascunhos
+root@datacenter:/etc/skel# maildirmake Maildir/.Lixeira
+root@datacenter:/etc/skel# maildirmake Maildir/.Spam
+
+/root/linuxforce/datacenter/postfix/mail_user.sh  - criando as pasta Maildir nos usuarios ja criados kamila,sophia,rafaela 
