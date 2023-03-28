@@ -861,6 +861,8 @@ apt install dovecot-core dovecot-pop3d dovecot-imapd -y
 
 cd /etc/dovecot
 
+
+
 dovecot.conf arquivo principal de configuração mais tem outras configuração em outros arquivos
 vim dovecot.conf 
 
@@ -1032,3 +1034,201 @@ root@datacenter:/etc/skel# maildirmake Maildir/.Lixeira
 root@datacenter:/etc/skel# maildirmake Maildir/.Spam
 
 /root/linuxforce/datacenter/postfix/mail_user.sh  - criando as pasta Maildir nos usuarios ja criados kamila,sophia,rafaela 
+
+-------------------------------------------------------------------------------
+
+configurar o serviço assl - tem que fazer a autenticação 
+
+apt install libsasl2-2 sasl2-bin libsasl2-modules -y  - instalar os pacotes 
+cd /etc/default/
+
+vim saslauthd 
+
+
+START=yes - ele permite a inicialização automatica desses serviços 
+NAME - nome do serviço
+
+mechanisms  = pam - que permite que vc use as mesma autenticações e contas
+
+THREADS = 5 cinco subrocessos que ele estarta para atender as requisiçoes 
+
+Options = armazena alguns objetos na autenticaçaõ   
+
+mkdir -pv /var/spool/postfix/var/run/saslauthd - criando as pastas
+
+cp /root/linuxforce/datacenter/postfix/etc/sasl/smtpd.conf /etc/postfix/sasl/ - copiar este arquivo 
+
+root@datacenter:/etc/default# cat /etc/postfix/sasl/smtpd.conf 
+pwcheck_method: saslauthd - metodo de atenticação saslauthd
+mech_list: plain login    
+
+adduser postfix sasl - integrando o usuario postfix no grupo sasl
+
+systemctl restart saslauthd 
+systemctl enable saslauthd  - habilitando na inicialização 
+
+configuração do sasl pronta 
+
+camanda de encriotação para tornar mais segura 
+
+mkdir -pv /etc/postfix/ssl
+
+openssl genrsa -out webmail.key 1024 - geraçaõ da chave
+genrsa - inclui o algoritmo ja junto 
+
+openssl req -new -key webmail.key -out webmail.csr - criação do certificado 
+
+Country Name (2 letter code) [AU]:BR
+State or Province Name (full name) [Some-State]:SAO PAULO
+Locality Name (eg, city) []:SAO PAULO
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:ASF
+Organizational Unit Name (eg, section) []:TI
+Common Name (e.g. server FQDN or YOUR name) []:mail.asf.com
+Email Address []:analista@asf.com
+
+Please enter the following 'extra' attributes
+to be sent with your certificate request
+A challenge password []:
+An optional company name []:
+
+Assinatura do certificado 
+
+openssl x509 -req -days 365 -in webmail.csr -signkey webmail.key -out webmail.crt
+
+-in - arquivo de entrada 
+
+webmail.crt - arquivo ja assinado 
+
+geração da CA - autoridade certificadora 
+
+openssl req -new -x509 -extensions v3_ca -keyout cakey.pem -out cacert.pem -days 365
+Generating a RSA private key
+...........................................................+++++
+...........................................................+++++
+writing new private key to 'cakey.pem'
+Enter PEM pass phrase:
+Verifying - Enter PEM pass phrase:
+-----
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [AU]:BR
+State or Province Name (full name) [Some-State]:SAO PAULO
+Locality Name (eg, city) []:SAO PAULO
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:ASF
+Organizational Unit Name (eg, section) []:TI
+Common Name (e.g. server FQDN or YOUR name) []:mail.asf.com
+Email Address []:analista@asf.com
+
+
+systemctl restart postfix dovecot saslauthd
+
+ping -c 2 mail.asf.com - testes dns
+
+chown -R sophia.g_ti /home/sophia/ - alterando o grupo da usuaria sophia
+ 
+-----------------------------------------------------------------------------
+Nos temos um cenerario que tem maquinas interna 192.168.1. que fazem servidores 
+Intranet - DNS master 
+Datacenter - DNS Slave, ldap, serviço de email dovecot,postifix  
+
+na maquina gatewal editar o arquivo /sbin/firewal.sh 
+
+-p tcp -d - destino 
+
+-s origem 
+
+firewal.sh 
+
+chattr -i /etc/resolv.conf
+
+na maquina cliente externo, alterar o arquivo /etc/resolv.conf
+ mudar o dns da google para o ultimo
+configurar o thunderbird
+
+----------------------------------------------------------------------
+
+Servidor web 
+
+vamos ver o apache e ndix 
+
+debian - apache2
+centos: httpd 
+
+servidor tem nomes direfentes nas versões do linux 
+
+1 - apt install apache2 -y
+
+- modulos
+- arquivos de configuração 
+- site 
+
+http://express.asf.com/ - ooodefault - usado para fazer testes para ver se esta funcionado o seviço.
+
+o dns fas a resoluçaõ de nomes express - para 192.168.1.10
+
+cd /etc/apache2/ 
+
+vim apache2.conf - principal arquivo de confifuração e o apache2.conf 
+
+dentro do conf-enable vai estar o arquivo security.conf
+mods-anable - modulos que estão habilitados
+
+arquivos ports altera a porta 
+
+mods-enable, conf-enable e sites-enable - estrutura de diretorios 
+
+mods-available
+mods-enabled
+conf-avaiable
+conf-enabled
+sites-available
+sites-enabled
+
+todos os arquivos novos de configutação ficam nos avalible 
+
+Modulos
+-a2enmod(habilitar)
+-a2idsmod(desabilitar)
+
+configuração 
+a2enconf
+a2disconf
+
+site
+a2ensite
+a2dissite
+
+/etc/apache2/envvars
+
+error.log - guarda warning 
+apachectl -t - configurar a sintaxe 
+
+a2disconf security - desabilitar esse modulo 
+a2enconf security - abilita o modulo
+ls -l /var/log/apache2 - todos os logs vão ficar dentro desse diretorio 
+
+intalar o php e complementos para subir uma pagina 
+
+apt install php php7.4-curl php7.4-gd php7.4-intl php7.4-xmlrpc php7.4-mysql -y
+
+php -v - ver a versão 
+
+root@intranet:/etc/apache2/mods-enabled# ls | grep php
+php7.4.conf
+php7.4.load
+
+systemctl restart apache2
+
+cd /srv/www
+apt install unzip - vamos prescizar extrair um arquivo 
+unzip /root/linuxforce/intranet/express.zip
+chown www-data:www-data -R /srv/www/express/ - mudar o dono do usuario e grupo 
+editar um arquivo para que o site possa subir de sites-available para /srv/www
+ 
+
+
