@@ -1230,5 +1230,85 @@ unzip /root/linuxforce/intranet/express.zip
 chown www-data:www-data -R /srv/www/express/ - mudar o dono do usuario e grupo 
 editar um arquivo para que o site possa subir de sites-available para /srv/www
  
+--------------------------------------------------------------------------------------------------
+´
+cd /etc/apache/sites-available
+
+vim express.conf
+
+VirutalHost - controle especifico sobre as paginas web
+
+apachectl -t - Verificar a sintaxe 
+
+systemctl restart apache2
+
+a2ensite express.conf - habilita o site
+
+systemctl reload apache2
+
+entrar no site express.asf.com
+
+mkdir -pv /etc/ssl/express - vai ser gerado aqui os certificados aumentando o nivel de seguranca 
+
+a2enmod ssl - habilitar esse modulo 
+a2enmod rewrite
+
+criar o ceritificado 
+
+1 - chave 
+2 - requisição do certificado 
+3 - assinatura 
 
 
+openssl genrsa -out express.key 2048 - gera a chave 
+
+root@intranet:/etc/apache2/sites-available# openssl req -new -key express.key -out express.csr - criando o certificado 
+
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [AU]:BR
+State or Province Name (full name) [Some-State]:SAO PAULO
+Locality Name (eg, city) []:SAO PAULO
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:ASF
+Organizational Unit Name (eg, section) []:TI
+Common Name (e.g. server FQDN or YOUR name) []:express.asf.com
+Email Address []:analista@asf.com
+
+Please enter the following 'extra' attributes
+to be sent with your certificate request
+A challenge password []:
+An optional company name []:
+
+openssl x509 -req -days 365 -in express.csr -signkey express.key -out express.crt - assinatura 
+
+SSLEngine On - halita para acesso pela porta 443
+
+apachectl -t
+
+instalação do banco de dados mariaDB
+tabela: log
+usuario: express
+senha: AllSafe0!
+banco: backup
+
+na maquina datacenter instalar o banco 
+
+apt install mariadb-server -y
+
+mariadb-secure-installation - maior seguranca 
+
+mysql -u root -p - conectar no banco de dados 
+
+show databases; - mostra as bases de dados
+
+create database backup; - criando a base de dados backup 
+use backup
+show tables;
+source /root/linuxforce/datacenter/mysql/backup.sql; - cria as tabelas 
+
+ 
