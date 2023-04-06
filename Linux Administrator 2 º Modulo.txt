@@ -1311,4 +1311,62 @@ use backup
 show tables;
 source /root/linuxforce/datacenter/mysql/backup.sql; - cria as tabelas 
 
- 
+-------------------------------------------------------------------------------------------------
+
+Login: express
+senha: AllSafe!
+
+mudar este usuario 
+select user from mysql.user; - ver quais sao os usuarios criados 
+
+grant all privileges on backup.* to express@'%' identified by 'AllSafe0!'; - dando as permissoes para o usuario express
+
+show grants for express@'%'; - ver quais as permissões que o usuario tem 
+
+flush privileges; - aplicar as alterações 
+
+ntpl |grep mariadb 
+
+vim /etc/mysql/mariadb.conf.d/50-server.cnf - entrar no arquivo e alterar o endereço ip mudar de 127.0.0.0 ou comentar a linha para que a rede possa acessar 
+
+systemctl restart mariadb
+
+LAMP: 
+
+L - Linux
+A - Apache
+M - mariadb
+P - PHP
+
+/etc/apache2/sites-available
+
+vim express.conf
+
+apachectl -t
+
+htpasswd -c -m /etc/apache2/.express rodrigo - criando usuarios 
+htpasswd -m /etc/apache2/.express tereza
+
+cat /etc/apache2/.express
+
+systemctl restart apache2
+
+apt install libapache2-mod-authnz-pam - modulo do apache, suporte autenticação suportada via pam 
+
+vim /etc/pam.d/apache2 - criar este arquivo 
+
+o pam trabalha com quatro gerenciadores ele cuida do processo de autenticação, autorização, troca de senha e de seções 
+
+
+apt install libapache2-mod-authnz-external pwauth 
+
+mkdir /srv/www/express/downloads
+
+cp /etc/*.conf  /srv/www/express/downloads/
+
+a2enmod authnz_ldap - habilitar o modulo 
+
+
+
+
+
