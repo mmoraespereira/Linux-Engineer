@@ -1366,7 +1366,46 @@ cp /etc/*.conf  /srv/www/express/downloads/
 
 a2enmod authnz_ldap - habilitar o modulo 
 
+------------------------------------------------------------------------------------------
 
+Tirando a indexação de lista o que esta no diretorio download 
 
+Erro Forbidden 
 
+cd /etc/apache2/conf-available
+entrar para tirar o nome do servidor e versão 
+entrar vim secutiry.conf
+
+tirar OS e por Prod
+
+Assinatura deixa como Off
+
+Ndix tambem e web server 
+
+apt update -y
+
+apt install nginx -y
+
+cd /etc/nginx
+
+vim nginx.conf e o principal aqruivo de configuração 
+
+systemctl enable nginx - habilitar na inicialização
+
+systemctl restart nginx
+
+ss -ntpl - ver se a porta esta ativa porta 80
+
+cd sites-available
+
+vim default
+
+apt install php7.4 php7.4-common php-pear php7.4-mbstring php7.4-fpm
+
+phpfpm - fazer a integração entre o nginx e o php 
+
+systemctl enable php7.4-fpm - habilitar na inicialização 
+systemctl restart php7.4-fpm nginx
+
+nginx -t
 
